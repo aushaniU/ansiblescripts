@@ -1,0 +1,42 @@
+# Playbook to install Nagios server
+
+
+- name: Check  Operating System
+  fail:
+    "msg="You're not running a supported operating system (CentOS or RHEL 7+)"
+   when: (ansible_os_family != "RedHat")
+   
+- name: Install EPEL repo
+  yum: name=epel-release state=present
+  become: true
+
+   
+- name: Install Nagios Packages and Comon Plugin
+  yum: name={{item}} state=present
+  become:true
+  with_items:
+   - nagios
+   - nagios-plugins-all
+   - nagios-plugins-nrpe
+  
+  
+- name: Set services to start httpd on boot
+  command: chkconfig httpd on
+  ignore_error: true
+  become: true
+  
+   
+- name: Set services to start Nagios on boot
+  command: chkconfig nagios on
+  ignore_error: true
+  become: true
+
+
+- name: Restart Nagios Service
+  service: name=nagios state=restarted
+  become: true
+
+- name: Restart HTTPD Service
+  service: name=httpd state=restarted
+  ignore_errors: true
+  become: true 
