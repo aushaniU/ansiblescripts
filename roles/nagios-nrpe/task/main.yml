@@ -1,0 +1,30 @@
+--- 
+# Playbook to install Nagios server and generate hosts/checks
+# This also installs NRPE on clients for more in-depth checks 
+# author: Aushani Udayangani
+
+- name: Check Operating System
+  fail:
+    msg="You're not running a supported operating system (CentOS or RHEL 7+)"
+  when: (ansible_os_family != "RedHat") 
+  
+- name: Install EPEL repo
+  yum: name=epel-release state=present
+  become: true
+
+- name: Install Nagios Packages & Common Plugins
+  yum: name={{ item }} state=present
+  become: true
+  with_items:
+    - nrpe
+    - nagios-plugins-all
+      
+    
+- name: Set NRPE to Start On Boot
+  command: chkconfig nrpe on
+  ignore_errors: true
+  become: true
+  
+- name: Restart NRPE Service
+  service: name=nrpe state=restarted
+  become: true     

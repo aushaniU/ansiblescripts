@@ -1,0 +1,8 @@
+--- # Setup Nagios Monitoring
+- hosts: nrpe-server
+  become: yes
+  connection: ssh
+  gather_facts: yes
+  
+  roles:
+- nagios-nrpe
